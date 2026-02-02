@@ -14,6 +14,7 @@ interface CartStore{
     addToCart: (productVariantId: number, quantity: number) => Promise<CartStoreResponse>
     updateCartItem: (productVariantId: number, quantity: number) => Promise<CartStoreResponse>,
     removeFromCart: (productVariantId: number) => Promise<CartStoreResponse>
+    createOrder: (cartId: number, shippingAddress: any, pgName: string) => Promise<CartStoreResponse>
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -86,6 +87,19 @@ export const useCartStore = create<CartStore>((set, get) => ({
                 return { status: error.response.data.status ?? 500, message: error.response.data.message ?? error.message, data: error.response.data.data ?? [] }
             }
             return { status: 500, message: error.message, data: [] }
+        }
+    },
+
+    createOrder: async (cartId: number, shippingAddress: any, pgName: string) => {
+        try {
+            const resp = await axiosInstance.post('/user/order/create', { cartId, shippingAddress, pgName })
+            return { status: resp.data.status, message: resp.data.message, data: resp.data.data }
+        } catch (error: any) {
+            console.error('createOrder error', error)
+            if (error.response && error.response.data) {
+                return { status: error.response.data.status ?? 500, message: error.response.data.message ?? error.message, data: error.response.data.data }
+            }
+            return { status: 500, message: error.message, data: null }
         }
     }
     
