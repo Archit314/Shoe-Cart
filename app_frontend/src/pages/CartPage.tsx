@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 
 function CartPage() {
 
-  const {getCart} = useCartStore()
+  const {getCart, addToCart, updateCartItem, removeFromCart} = useCartStore()
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -24,27 +24,45 @@ function CartPage() {
     fetchCart();
   }, []);
 
-  // const increaseQty = (id: number) => {
-  //   setItems((prev) =>
-  //     prev.map((item) =>
-  //       item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-  //     )
-  //   );
-  // };
+  const increaseQty = async (item: any) => {
+    const resp = await addToCart(item.productVariant.id, 1)
+    if (resp.status !== 200) {
+      toast.error(resp.message)
+    } else {
+      const fresh = await getCart()
+      if (fresh.status === 200) setItems(fresh.data.items)
+    }
+  }
 
-  // const decreaseQty = (id: number) => {
-  //   setItems((prev) =>
-  //     prev.map((item) =>
-  //       item.id === id && item.quantity > 1
-  //         ? { ...item, quantity: item.quantity - 1 }
-  //         : item
-  //     )
-  //   );
-  // };
+  const decreaseQty = async (item: any) => {
+    if (item.quantity > 1) {
+      const resp = await updateCartItem(item.productVariant.id, item.quantity - 1)
+      if (resp.status !== 200) {
+        toast.error(resp.message)
+      } else {
+        const fresh = await getCart()
+        if (fresh.status === 200) setItems(fresh.data.items)
+      }
+    } else {
+      const resp = await removeFromCart(item.productVariant.id)
+      if (resp.status !== 200) {
+        toast.error(resp.message)
+      } else {
+        const fresh = await getCart()
+        if (fresh.status === 200) setItems(fresh.data.items)
+      }
+    }
+  }
 
-  // const removeFromCart = (id: number) => {
-  //   setItems((prev) => prev.filter((item) => item.id !== id));
-  // };
+  const removeItem = async (item: any) => {
+    const resp = await removeFromCart(item.productVariant.id)
+    if (resp.status !== 200) {
+      toast.error(resp.message)
+    } else {
+      const fresh = await getCart()
+      if (fresh.status === 200) setItems(fresh.data.items)
+    }
+  }
 
   const clearCart = () => {
     setItems([]);
@@ -86,14 +104,14 @@ function CartPage() {
 
                 <div className="flex items-center gap-3">
                   <button
-                    // onClick={() => decreaseQty(item.id)}
+                    onClick={() => decreaseQty(item)}
                     className="p-2 rounded-lg bg-white/10 hover:bg-white/20"
                   >
                     <Minus size={16} />
                   </button>
                   <span className="font-bold">{item.quantity}</span>
                   <button
-                    // onClick={() => increaseQty(item.id)}
+                    onClick={() => increaseQty(item)}
                     className="p-2 rounded-lg bg-white/10 hover:bg-white/20"
                   >
                     <Plus size={16} />
@@ -103,7 +121,7 @@ function CartPage() {
                 <div className="flex items-center gap-4">
                   <p className="font-bold">₹{item.price * item.quantity}</p>
                   <button
-                    // onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeItem(item)}
                     className="p-2 text-red-400 hover:text-red-600"
                   >
                     <Trash2 size={20} />

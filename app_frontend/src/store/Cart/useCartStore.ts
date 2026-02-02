@@ -12,6 +12,8 @@ interface CartStore{
     cart: any[],
     getCart: () => Promise<CartStoreResponse>,
     addToCart: (productVariantId: number, quantity: number) => Promise<CartStoreResponse>
+    updateCartItem: (productVariantId: number, quantity: number) => Promise<CartStoreResponse>,
+    removeFromCart: (productVariantId: number) => Promise<CartStoreResponse>
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -53,6 +55,35 @@ export const useCartStore = create<CartStore>((set, get) => ({
             console.error('addToCart error', error)
             if (error.response && error.response.data) {
                 return { status: error.response.data.status ?? 500, message: error.response.data.message ?? error.message, data: error.response.data.data }
+            }
+            return { status: 500, message: error.message, data: [] }
+        }
+    }
+    ,
+
+    updateCartItem: async (productVariantId: number, quantity: number) => {
+        try {
+            const resp = await axiosInstance.patch(`/user/cart/${productVariantId}`, { quantity })
+            try { await get().getCart() } catch (e) { }
+            return { status: resp.data.status, message: resp.data.message, data: resp.data.data }
+        } catch (error: any) {
+            console.error('updateCartItem error', error)
+            if (error.response && error.response.data) {
+                return { status: error.response.data.status ?? 500, message: error.response.data.message ?? error.message, data: error.response.data.data }
+            }
+            return { status: 500, message: error.message, data: [] }
+        }
+    },
+
+    removeFromCart: async (productVariantId: number) => {
+        try {
+            const resp = await axiosInstance.delete(`/user/cart/${productVariantId}`)
+            try { await get().getCart() } catch (e) { }
+            return { status: resp.data.status, message: resp.data.message, data: resp.data.data ?? [] }
+        } catch (error: any) {
+            console.error('removeFromCart error', error)
+            if (error.response && error.response.data) {
+                return { status: error.response.data.status ?? 500, message: error.response.data.message ?? error.message, data: error.response.data.data ?? [] }
             }
             return { status: 500, message: error.message, data: [] }
         }

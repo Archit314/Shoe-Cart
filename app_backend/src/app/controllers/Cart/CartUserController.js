@@ -60,3 +60,23 @@ export const getCartDetails = async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal server error' });
     }
 };
+
+export const updateCartItem = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { productVariantId } = req.params;
+        const { quantity } = req.body;
+
+        if (!productVariantId || typeof quantity === 'undefined') {
+            return res.status(422).json({ status: 422, message: 'Product variant ID and quantity are required.' });
+        }
+
+        const cartUserService = new CartUserService()
+        const updated = await cartUserService.updateItemQuantity(userId, productVariantId, quantity)
+
+        return res.status(updated.status).json({ status: updated.status, message: updated.message, data: updated.data })
+    } catch (error) {
+        console.error('[CartUserController]: updateCartItem error', error);
+        return res.status(500).json({ status: 500, message: 'Internal server error' });
+    }
+};
