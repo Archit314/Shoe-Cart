@@ -15,6 +15,7 @@ import BrandListPage from "./pages/Brand/BrandListPage"
 import CartPage from "./pages/CartPage"
 import ShopPage from "./pages/ShopPage"
 import ProductDetailPage from "./pages/ProductDetailPage"
+import OrderConfirmPage from "./pages/OrderConfirmPage"
 import { useAuthStore } from "./store/User/useAuthStore"
 import { useEffect } from "react"
 import { Toaster } from "react-hot-toast"
@@ -49,6 +50,7 @@ function App() {
         <Route path="/shop/category/:categoryId" element={<ShopPage />}/>
         <Route path="/shop/brand/:brandId" element={<ShopPage />}/>
         <Route path="/product/:id" element={<ProductDetailPage />}/>
+        <Route path="/order/confirm" element={<OrderConfirmPage />}/>
       </Routes>
       <Toaster
         position="bottom-left"

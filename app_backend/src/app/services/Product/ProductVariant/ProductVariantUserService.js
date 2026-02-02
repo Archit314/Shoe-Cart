@@ -7,7 +7,7 @@ export default class ProductVariantUserService {
 
         const variants = await ProductVariant.findAll({
             where: { product_id: productId },
-            attributes: ['color', 'size', 'price'],
+            attributes: ['id', 'color', 'size', 'price'],
             include: [
                 {
                     association: 'media',
