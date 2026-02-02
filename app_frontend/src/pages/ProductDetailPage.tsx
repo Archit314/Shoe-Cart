@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { useProductStore } from "../store/Product/useProductStore"
+import { useCartStore } from "../store/Cart/useCartStore"
 
 type Variant = {
   id?: number
@@ -34,15 +35,26 @@ function ProductDetailPage () {
         fetchData()
     }, [id, getProductVariants])
 
-    const handleAddToCart = () => {
+    const { addToCart } = useCartStore()
+
+    const handleAddToCart = async () => {
         if (!selectedVariant) {
         alert("⚠️ Please select size and color")
         return
         }
-        alert(
-        `✅ Added to cart: ${selectedVariant.color}, Size ${selectedVariant.size}`
-        )
-        navigate("/cart")
+
+        if (!selectedVariant.id) {
+            alert("⚠️ Variant id missing")
+            return
+        }
+
+        const res = await addToCart(selectedVariant.id, 1)
+        if (res && res.status === 200) {
+            alert(`✅ Added to cart: ${selectedVariant.color}, Size ${selectedVariant.size}`)
+            navigate("/cart")
+        } else {
+            alert(`⚠️ ${res?.message || 'Failed to add to cart'}`)
+        }
     }
 
     return (
