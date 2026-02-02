@@ -10,10 +10,11 @@ type CartStoreResponse = {
 interface CartStore{
     isGettingCart: boolean,
     cart: any[],
-    getCart: () => Promise<CartStoreResponse>
+    getCart: () => Promise<CartStoreResponse>,
+    addToCart: (productVariantId: number, quantity: number) => Promise<CartStoreResponse>
 }
 
-export const useCartStore = create<CartStore>((set) => ({
+export const useCartStore = create<CartStore>((set, get) => ({
 
     isGettingCart: false,
     cart: [],
@@ -32,11 +33,28 @@ export const useCartStore = create<CartStore>((set) => ({
             console.error(error)
             set({ isGettingCart: false, cart: [] })
 
-            if(error.status == 422){
+            if(error.response && error.response.data && error.response.data.status === 422){
                 return {status: error.response.data.status, message: error.response.data.message, data: error.response.data.data}
             }
             
             return {status: 500, message: error.message, data: [] }
+        }
+    },
+
+    addToCart: async (productVariantId: number, quantity: number) => {
+        try {
+            const resp = await axiosInstance.post('/user/cart', { productVariantId, quantity })
+
+            // refresh cart state
+            try { await get().getCart() } catch (e) { /* ignore refresh errors */ }
+
+            return { status: resp.data.status, message: resp.data.message, data: resp.data.data }
+        } catch (error: any) {
+            console.error('addToCart error', error)
+            if (error.response && error.response.data) {
+                return { status: error.response.data.status ?? 500, message: error.response.data.message ?? error.message, data: error.response.data.data }
+            }
+            return { status: 500, message: error.message, data: [] }
         }
     }
     
