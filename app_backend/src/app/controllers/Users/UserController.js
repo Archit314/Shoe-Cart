@@ -55,3 +55,31 @@ export const signIn = async (req, res) => {
         return res.status(500).json({status: 500, message: "Internal Server Error"});
     }
 }
+
+export const logout = async (req, res) => {
+    try {
+
+        const requestCookie = req.cookies.jwt_token;
+        if(!requestCookie){
+            return res.status(422).json({status: 422, message: `User not logged in`})
+        }
+        
+        res.clearCookie('jwt_token')
+        console.log(`User cookie remoced successfully`);
+
+        return res.status(200).json({status: 200, message: `User logged out successfully`})
+    } catch (error) {
+        console.log(`Error in UserController -> logout: `, error.message);
+        return res.status(500).json({status: 500, message: `Internal server error`})
+    }
+}
+
+export const checkAuth = async (req, res) => {
+
+    try {
+        return res.status(200).json(req.user)
+    } catch (error) {
+        console.log(`Error in UserController -> checkAuth: `, error.message);
+        return res.status(500).json({status: 500, message: `Internal server error`})
+    }
+}
