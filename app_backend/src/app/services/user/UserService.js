@@ -130,4 +130,17 @@ export default class UserService{
 
         return {status: 200, message: `User sign-in successfully`, data: getJwtToken}
     }
+
+    async removeUserAccount(userId){
+
+        const existUser = await User.findOne({ where: { id: userId}})
+        if(!existUser){
+            return {status: 422, message: `User not exist with id: ${userId}`}
+        }
+
+        await existUser.destroy()
+        console.log('User account removed successfully');
+
+        return {status: 200, message: `User account removed successfully`, data: existUser}
+    }
 }

@@ -1,4 +1,4 @@
-import UserService from "../../service/user/UserService.js";
+import UserService from "../../services/user/UserService.js";
 
 export const signUp = async (req, res) => {
 
@@ -71,6 +71,26 @@ export const logout = async (req, res) => {
     } catch (error) {
         console.log(`Error in UserController -> logout: `, error.message);
         return res.status(500).json({status: 500, message: `Internal server error`})
+    }
+}
+
+export const removeAccount = async (req, res) => {
+
+    try {
+        
+        const userId = req.params.id;
+        if(!userId){
+            return res.status(422).json({status: 422, message: "User ID is required"});
+        }
+        const userService = new UserService()
+        const removedUser = await userService.removeUserAccount(userId)
+        if(removedUser.status != 200){
+            return res.status(removedUser.status).json({status: removedUser.status, message: removedUser.message})
+        }
+        return res.status(removedUser.status).json({status: removedUser.status, message: removedUser.message});
+    } catch (error) {
+        console.log('Error in UserController removeAccount:', error.message);
+        return res.status(500).json({status: 500, message: "Internal Server Error"});
     }
 }
 
