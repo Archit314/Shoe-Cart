@@ -1,9 +1,1 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* small custom tweaks */
-body { @apply bg-gray-50 min-h-screen; }
-.brand { @apply text-xl font-bold text-slate-900 }
-.nav-links a { @apply text-slate-600 hover:text-slate-900 ml-3 }
-
+@import "tailwindcss";
