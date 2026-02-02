@@ -55,3 +55,13 @@ export const signIn = async (req, res) => {
         return res.status(500).json({status: 500, message: "Internal Server Error"});
     }
 }
+
+export const checkAuth = async (req, res) => {
+
+    try {
+        return res.status(200).json(req.user)
+    } catch (error) {
+        console.log(`Error in UserController -> checkAuth: `, error.message);
+        return res.status(500).json({status: 500, message: `Internal server error`})
+    }
+}
